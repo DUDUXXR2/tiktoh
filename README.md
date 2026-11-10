@@ -75,6 +75,21 @@ hdc install entry-signed.hap
 设备需要开启 **开发者模式 + USB 调试**，并且签名证书里包含该设备的 UDID
 （自动签名会自动带上你登录账号下的设备）。
 
+### 方式三：HoKit 可视化签名（最省事）
+
+[HoKit](https://github.com/yabi-zzh/HoKit) 是开源的 HarmonyOS 桌面辅助工具（投屏 / 性能监控 / 应用解析 / **可视化重签名**），
+重签名功能会**自动拉取你华为开发者账号下的证书与 Profile**，拖一下文件点个按钮就完成，全程不用敲命令。
+
+1. 到 [HoKit Releases](https://github.com/yabi-zzh/HoKit/releases) 下载安装：
+   Windows `.exe` / macOS `.dmg` / Linux `.AppImage`（macOS 首次打开若提示「已损坏」，
+   终端执行 `sudo xattr -rd com.apple.quarantine /Applications/HoKit.app`）。
+2. 在 HoKit 里登录**华为开发者账号**（重签名功能需要；目标设备的 UDID 可在「已注册设备」页一键注册）。
+3. 左侧导航 →「应用重签名」，把本仓库 Release 里的
+   `TikToh-<版本>-unsigned.app`（或把它按 `.zip` 解出的 `entry-default.hap`）拖进上传区。
+4. 点「开始重签名」，等日志跑完后点「输出目录」拿到签名包，`hdc install entry-signed.hap` 装进设备。
+
+> 注意：重签名仅用于调试分发；同一应用若有多个包，先签 HAP 主包再签 HSP 共享包。
+
 ---
 
 ## 应用内更新
