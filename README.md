@@ -13,25 +13,25 @@
 
 ---
 
-## ⚠️ 下载前必读：我们只提供未签名包
+## 📦 下载前须知：默认提供未签名包
 
-Release 里的唯一资产是：
+Release 里目前提供两种未签名资产，按习惯挑选：
 
-```
-TikToh-<版本>-unsigned.app
-```
+| 资产 | 是什么 | 适合 |
+| --- | --- | --- |
+| `TikToh-<版本>.hap` | HarmonyOS **HAP 单模块安装包（未签名）** | 比较省事：用 HoKit 等工具可视化签名后即可安装 |
+| `TikToh-<版本>.app.zip` | HarmonyOS **App Pack（未签名）**，解压得到 `TikToh-<版本>.app` | 走 DevEco / 命令行签名流程 |
 
-这是 HarmonyOS 的 **App Pack（未签名）**，不是 `.hap`，也不能直接双击安装。
-原因很简单：签名包必然绑定签名者的开发者证书，别人拿到也装不上；
-而未签名包让你用自己的证书签名，装进你自己的设备生态里。
+两种都**不能直接双击安装**，需要先签名。主要原因是：签名包会绑定签名者的开发者证书，
+换个人或换台设备往往装不上；未签名包让你用自己的证书签名，装进自己的设备生态里，
+责任边界也更清晰。
 
-**本仓库永远不会上传：**
+**目前不随 Release 发布：**
 
 | 类型 | 说明 |
 | --- | --- |
-| `*.hap` | 单模块产物，无论是否签名都不发 |
-| `*-signed.app` | 签名后的 App Pack，不公开发布 |
-| `*.p12 / *.cer / *.p7b` | 证书与私钥材料，绝不入库 |
+| `*-signed.hap` / `*-signed.app` | 签名产物会绑定开发者签名材料，一般不对外分发 |
+| `*.p12 / *.cer / *.p7b` | 证书与私钥属于个人敏感材料，不随仓库分发 |
 
 ---
 
@@ -46,8 +46,8 @@ TikToh-<版本>-unsigned.app
    一般是 `C:\Users\<你>\.ohos\config\default_<工程名>_<hash>.p12`。
 4. 用 `hap-sign-tool` 或直接改一个空工程，把本项目的 `.app` 解开、签名后安装。
 
-> 更快的土办法：把 Release 里的 `.app` 后缀改成 `.zip` 解压，得到 `entry-default.hap`；
-> 在你的空工程里用同一套证书给它签名：
+> 更快的土办法：把 `TikToh-<版本>.app.zip` 解压，得到 `TikToh-<版本>.app`（App Pack），
+> 再解一层得到 `entry-default-unsigned.hap`；在你的空工程里用同一套证书给它签名：
 > ```
 > java -jar hap-sign-tool.jar sign-app \
 >   -mode localSign -keyAlias "<你的别名>" \
@@ -61,9 +61,10 @@ TikToh-<版本>-unsigned.app
 ### 方式二：命令行签名 + 安装
 
 ```bash
-# 1. 解包
-mv TikToh-0.1.0-unsigned.app TikToh-0.1.0.zip && unzip TikToh-0.1.0.zip
-# 得到 entry-default.hap
+# 1. 解包：TikToh-<版本>.app.zip 解压得到 .app，再解一层得到 entry-default-unsigned.hap
+mv TikToh-0.1.6.app.zip TikToh-0.1.6.zip && unzip TikToh-0.1.6.zip
+unzip TikToh-0.1.6.app
+# 得到 entry-default-unsigned.hap
 
 # 2. 用你自己的证书签名（见上面的 hap-sign-tool 命令）
 
@@ -84,8 +85,8 @@ hdc install entry-signed.hap
    Windows `.exe` / macOS `.dmg` / Linux `.AppImage`（macOS 首次打开若提示「已损坏」，
    终端执行 `sudo xattr -rd com.apple.quarantine /Applications/HoKit.app`）。
 2. 在 HoKit 里登录**华为开发者账号**（重签名功能需要；目标设备的 UDID 可在「已注册设备」页一键注册）。
-3. 左侧导航 →「应用重签名」，把本仓库 Release 里的
-   `TikToh-<版本>-unsigned.app`（或把它按 `.zip` 解出的 `entry-default.hap`）拖进上传区。
+3. 左侧导航 →「应用重签名」，把本仓库 Release 里的 `TikToh-<版本>.hap`
+   （或 `TikToh-<版本>.app.zip` 解压得到的 `.app`）拖进上传区。
 4. 点「开始重签名」，等日志跑完后点「输出目录」拿到签名包，`hdc install entry-signed.hap` 装进设备。
 
 > 注意：重签名仅用于调试分发；同一应用若有多个包，先签 HAP 主包再签 HSP 共享包。
@@ -116,4 +117,4 @@ GET https://api.github.com/repos/DUDUXXR2/tiktoh/releases/latest
 
 - tag 用纯版本号 `0.1.1`（客户端会去掉 `v` 前缀再比较）；
 - Release 正文写人话的更新说明，它会原样显示在应用内更新弹窗里；
-- 资产只有一个 `TikToh-<版本>-unsigned.app`。
+- 资产为 `TikToh-<版本>.hap` 与 `TikToh-<版本>.app.zip`（未签名；`.app` 因 GitHub 扩展名黑名单以 zip 上传，zip 内保留 `.app` 命名）。
