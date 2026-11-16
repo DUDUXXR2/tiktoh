@@ -19,12 +19,12 @@ Release 里目前提供两种未签名资产，按习惯挑选：
 
 | 资产 | 是什么 | 适合 |
 | --- | --- | --- |
-| `TikToh-<版本>.hap` | HarmonyOS **HAP 单模块安装包（未签名）** | 比较省事：用 HoKit 等工具可视化签名后即可安装 |
+| `TikToh-<版本>.hap` | HarmonyOS **HAP 单模块安装包（未签名）** | 最省事：用手机端「轻启安装器」一键装（见方式一）；也可用 HoKit 可视化签名 |
 | `TikToh-<版本>.app.zip` | HarmonyOS **App Pack（未签名）**，解压得到 `TikToh-<版本>.app` | 走 DevEco / 命令行签名流程 |
 
-两种都**不能直接双击安装**，需要先签名。主要原因是：签名包会绑定签名者的开发者证书，
-换个人或换台设备往往装不上；未签名包让你用自己的证书签名，装进自己的设备生态里，
-责任边界也更清晰。
+这不代表「必须自己签」：装好**轻启安装器**后，未签名的 HAP 可以在手机端直接一键安装（方式一）。
+其余情况下需要先签名 —— 签名包会绑定签名者的开发者证书，换个人或换台设备往往装不上；
+未签名包让你用自己的证书签名，装进自己的设备生态里，责任边界也更清晰。
 
 **目前不随 Release 发布：**
 
@@ -35,9 +35,25 @@ Release 里目前提供两种未签名资产，按习惯挑选：
 
 ---
 
-## 怎么安装（自己签名）
+## 怎么安装
 
-### 方式一：DevEco Studio 自动签名（推荐，最省事）
+### 方式一：轻启安装器（最推荐，最省事）
+
+思路：先用电脑把「轻启安装器」这个 HAP 装进手机，之后 TikToh 的 HAP 在手机端轻启里**一键安装**，不用再碰电脑、也不用自己签名。
+
+1. 手机准备：设置 → 关于手机，连点「版本号」开启**开发者模式**，再打开 **USB 调试**；用数据线连电脑。
+2. 电脑准备：从 [小白调试助手 3.1.0](https://github.com/likuai2010/auto-installer/releases/tag/3.1.0)
+   或 [HoKit](https://github.com/yabi-zzh/HoKit/releases) 下载**对应你系统（Windows / macOS / Linux）**的版本并安装。
+3. 下载 [轻启安装器 v0.4.67](https://github.com/thx853068675-dev/QSStore/releases/tag/v0.4.67) 的 HAP。
+4. 按上面工具的 GitHub 说明把**轻启安装器**装进手机（小白调试助手连上设备后选这个 HAP 安装；
+   HoKit 则是「应用重签名」拖入 HAP → 签名 → 安装/推送到设备）。
+5. 手机打开**轻启安装器**，在它的界面里选中本仓库 Release 里的 `TikToh-<版本>.hap`，
+   点一键安装即可。之后再更新版本，同样丢进轻启点一下就完事。
+
+> 首次用电脑装轻启这一步是绕不开的（鸿蒙不允许第三方 HAP 直接在手机里侧载）；
+> 装好轻启之后，后续所有 HAP 都能在手机上自助安装。
+
+### 方式二：DevEco Studio 自动签名
 
 1. 用 **DevEco Studio 5.0 / 6.0+** 新建一个空工程（任意包名）。
 2. 打开 `File > Project Structure > Signing Configs`，勾选 **Automatically generate signature**，
@@ -58,7 +74,7 @@ Release 里目前提供两种未签名资产，按习惯挑选：
 > hdc install entry-signed.hap
 > ```
 
-### 方式二：命令行签名 + 安装
+### 方式三：命令行签名 + 安装
 
 ```bash
 # 1. 解包：TikToh-<版本>.app.zip 解压得到 .app，再解一层得到 entry-default-unsigned.hap
@@ -76,7 +92,7 @@ hdc install entry-signed.hap
 设备需要开启 **开发者模式 + USB 调试**，并且签名证书里包含该设备的 UDID
 （自动签名会自动带上你登录账号下的设备）。
 
-### 方式三：HoKit 可视化签名（最省事）
+### 方式四：HoKit 可视化签名
 
 [HoKit](https://github.com/yabi-zzh/HoKit) 是开源的 HarmonyOS 桌面辅助工具（投屏 / 性能监控 / 应用解析 / **可视化重签名**），
 重签名功能会**自动拉取你华为开发者账号下的证书与 Profile**，拖一下文件点个按钮就完成，全程不用敲命令。
